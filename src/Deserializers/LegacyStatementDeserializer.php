@@ -41,9 +41,6 @@ class LegacyStatementDeserializer implements Deserializer {
 		$this->serialization = $serialization;
 
 		$this->assertIsArray();
-		$this->assertHasKey( 'm', 'Mainsnak serialization is missing' );
-		$this->assertHasKey( 'q', 'Qualifiers serialization is missing' );
-		$this->assertHasKey( 'g', 'Guid is missing in serialization' );
 		$this->assertHasKey( 'rank', 'Rank is missing in serialization' );
 		$this->assertHasKey( 'refs', 'Refs are missing in serialization' );
 
@@ -73,10 +70,14 @@ class LegacyStatementDeserializer implements Deserializer {
 	}
 
 	private function newStatementFromClaim( Claim $claim ) {
-		return new Statement(
+		$statement = new Statement(
 			$claim->getMainSnak(),
 			$claim->getQualifiers()
 		);
+
+		$statement->setGuid( $claim->getGuid() );
+
+		return $statement;
 	}
 
 	private function setRank( Statement $statement ) {

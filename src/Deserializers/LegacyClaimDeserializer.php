@@ -41,7 +41,7 @@ class LegacyClaimDeserializer implements Deserializer {
 		$this->assertHasKey( 'q', 'Qualifiers serialization is missing' );
 		$this->assertHasKey( 'g', 'Guid is missing in Claim serialization' );
 
-		return $this->newClaimFormSerialization();
+		return $this->newClaimFromSerialization();
 	}
 
 	private function assertIsArray() {
@@ -56,25 +56,12 @@ class LegacyClaimDeserializer implements Deserializer {
 		}
 	}
 
-	private function newClaimFormSerialization() {
-		$claim = $this->newClaimOrStatement();
+	private function newClaimFromSerialization() {
+		$claim = $this->getClaim();
 
 		$this->setGuid( $claim );
 
 		return $claim;
-	}
-
-	private function newClaimOrStatement() {
-		if ( $this->isStatement() ) {
-			return $this->getStatement();
-		}
-		else {
-			return $this->getClaim();
-		}
-	}
-
-	private function isStatement() {
-		return array_key_exists( 'rank', $this->serialization );
 	}
 
 	private function getClaim() {
@@ -82,27 +69,6 @@ class LegacyClaimDeserializer implements Deserializer {
 			$this->getMainSnak(),
 			$this->getQualifiers()
 		);
-	}
-
-	private function getStatement() {
-		$statement = new Statement(
-			$this->getMainSnak(),
-			$this->getQualifiers(),
-			$this->getReferences()
-		);
-
-		$this->setRank( $statement );
-
-		return $statement;
-	}
-
-	private function setRank( Statement $statement ) {
-		try {
-			$statement->setRank( $this->serialization['rank'] );
-		}
-		catch ( InvalidArgumentException $ex ) {
-			throw new DeserializationException( $ex->getMessage(), $ex );
-		}
 	}
 
 	private function getMainSnak() {
@@ -120,20 +86,6 @@ class LegacyClaimDeserializer implements Deserializer {
 		catch ( InvalidArgumentException $ex ) {
 			throw new DeserializationException( $ex->getMessage(), $ex );
 		}
-	}
-
-	private function getReferences() {
-		$references = array();
-
-		foreach ( $this->serialization['refs'] as $referenceSerialization ) {
-			$references[] = $this->deserializeReference( $referenceSerialization );
-		}
-
-		return new ReferenceList( $references );
-	}
-
-	private function deserializeReference( $serialization ) {
-		return new Reference( $this->snakListDeserializer->deserialize( $serialization ) );
 	}
 
 }

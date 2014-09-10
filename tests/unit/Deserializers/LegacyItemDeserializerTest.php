@@ -4,11 +4,12 @@ namespace Tests\Wikibase\InternalSerialization\Deserializers;
 
 use Deserializers\Deserializer;
 use Wikibase\DataModel\Claim\Claim;
-use Wikibase\DataModel\Claim\Statement;
 use Wikibase\DataModel\Entity\BasicEntityIdParser;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\SiteLink;
 use Wikibase\DataModel\Snak\PropertyNoValueSnak;
+use Wikibase\DataModel\Statement\Statement;
+use Wikibase\DataModel\Statement\StatementList;
 use Wikibase\InternalSerialization\Deserializers\LegacyClaimDeserializer;
 use Wikibase\InternalSerialization\Deserializers\LegacyEntityIdDeserializer;
 use Wikibase\InternalSerialization\Deserializers\LegacyFingerprintDeserializer;
@@ -16,6 +17,7 @@ use Wikibase\InternalSerialization\Deserializers\LegacyItemDeserializer;
 use Wikibase\InternalSerialization\Deserializers\LegacySiteLinkListDeserializer;
 use Wikibase\InternalSerialization\Deserializers\LegacySnakDeserializer;
 use Wikibase\InternalSerialization\Deserializers\LegacySnakListDeserializer;
+use Wikibase\InternalSerialization\Deserializers\LegacyStatementDeserializer;
 
 /**
  * @covers Wikibase\InternalSerialization\Deserializers\LegacyItemDeserializer
@@ -34,16 +36,19 @@ class LegacyItemDeserializerTest extends \PHPUnit_Framework_TestCase {
 		$idDeserializer = new LegacyEntityIdDeserializer( new BasicEntityIdParser() );
 
 		$snakDeserializer = new LegacySnakDeserializer( $this->getMock( 'Deserializers\Deserializer' ) );
+		$snakListDeserializer = new LegacySnakListDeserializer( $snakDeserializer );
 
-		$claimDeserializer = new LegacyClaimDeserializer(
-			$snakDeserializer,
+		$claimDeserializer = new LegacyClaimDeserializer( $snakDeserializer, $snakListDeserializer );
+
+		$statementDeserializer = new LegacyStatementDeserializer(
+			$claimDeserializer,
 			new LegacySnakListDeserializer( $snakDeserializer )
 		);
 
 		$this->deserializer = new LegacyItemDeserializer(
 			$idDeserializer,
 			new LegacySiteLinkListDeserializer(),
-			$claimDeserializer,
+			$statementDeserializer,
 			new LegacyFingerprintDeserializer()
 		);
 	}
@@ -128,7 +133,7 @@ class LegacyItemDeserializerTest extends \PHPUnit_Framework_TestCase {
 	public function testGivenStatement_itemHasStatement() {
 		$item = Item::newEmpty();
 
-		$item->addClaim( $this->newStatement() );
+		$item->setStatements( $this->newStatementList() );
 
 		$this->assertDeserialization(
 			array(
@@ -138,6 +143,11 @@ class LegacyItemDeserializerTest extends \PHPUnit_Framework_TestCase {
 			),
 			$item
 		);
+	}
+
+	private function newStatementList() {
+		$statement = $this->newStatement();
+		return new StatementList( array( $statement ) );
 	}
 
 	private function newStatement() {
@@ -159,7 +169,7 @@ class LegacyItemDeserializerTest extends \PHPUnit_Framework_TestCase {
 	public function testGivenStatementWithLegacyKey_itemHasStatement() {
 		$item = Item::newEmpty();
 
-		$item->addClaim( $this->newStatement() );
+		$item->setStatements( $this->newStatementList() );
 
 		$this->assertDeserialization(
 			array(

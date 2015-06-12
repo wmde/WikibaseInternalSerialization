@@ -6,7 +6,6 @@ use DataValues\DataValue;
 use DataValues\UnDeserializableValue;
 use Deserializers\Deserializer;
 use Deserializers\Exceptions\DeserializationException;
-use LogicException;
 use Wikibase\DataModel\Snak\PropertyNoValueSnak;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 use Wikibase\DataModel\Snak\PropertyValueSnak;
@@ -41,11 +40,7 @@ class LegacySnakDeserializer implements Deserializer {
 				return new PropertySomeValueSnak( $serialization[1] );
 			case 'value':
 				return $this->deserializeValueSnak( $serialization );
-				// @codeCoverageIgnoreStart
-			default:
-				throw new LogicException();
 		}
-		// @codeCoverageIgnoreEnd
 	}
 
 	private function deserializeValueSnak( array $serialization ) {

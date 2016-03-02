@@ -76,7 +76,7 @@ class LegacyEntityIdDeserializer implements DispatchableDeserializer {
 	 *
 	 * @return bool
 	 */
-	public function isDeserializerFor( $serialization )	{
+	public function isDeserializerFor( $serialization ) {
 		return is_array( $serialization )
 			&& count( $serialization ) === 2
 			&& array_key_exists( 0, $serialization )

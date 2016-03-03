@@ -3,7 +3,6 @@
 namespace Wikibase\InternalSerialization;
 
 use Deserializers\Deserializer;
-use Deserializers\DispatchableDeserializer;
 use Wikibase\DataModel\Entity\EntityIdParser;
 use Wikibase\InternalSerialization\Deserializers\LegacyEntityDeserializer;
 use Wikibase\InternalSerialization\Deserializers\LegacyEntityIdDeserializer;
@@ -25,14 +24,7 @@ use Wikibase\InternalSerialization\Deserializers\LegacyStatementDeserializer;
  */
 class LegacyDeserializerFactory {
 
-	/**
-	 * @var Deserializer
-	 */
 	private $dataValueDeserializer;
-
-	/**
-	 * @var EntityIdParser
-	 */
 	private $idParser;
 
 	public function __construct( Deserializer $dataValueDeserializer, EntityIdParser $idParser ) {
@@ -41,7 +33,7 @@ class LegacyDeserializerFactory {
 	}
 
 	/**
-	 * @return DispatchableDeserializer
+	 * @return Deserializer
 	 */
 	public function newEntityDeserializer() {
 		return new LegacyEntityDeserializer(
@@ -103,7 +95,7 @@ class LegacyDeserializerFactory {
 	}
 
 	/**
-	 * @return DispatchableDeserializer
+	 * @return Deserializer
 	 */
 	public function newStatementDeserializer() {
 		return new LegacyStatementDeserializer(

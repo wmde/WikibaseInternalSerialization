@@ -37,24 +37,25 @@ class DeserializerFactory {
 	private $currentFactory;
 
 	/**
-	 * @var DispatchableDeserializer|null $currentEntityDeserializer
-	 */
-	private $currentEntityDeserializer;
-
-	/**
+	 * @since 3.0 added the required $entityDeserializers argument
+	 *
+	 * @param DispatchableDeserializer[]|callable[] $entityDeserializers A list of either
+	 *  DispatchableDeserializer objects that are able to deserialize Entities, or callables that
+	 *  return such objects. The callables must accept the DeserializerFactory as first argument.
 	 * @param Deserializer $dataValueDeserializer
 	 * @param EntityIdParser $idParser
-	 * @param DispatchableDeserializer|null $currentEntityDeserializer used instead of constructing
-	 *        a new current Deserializer for entities using a current DeserializerFactory.
 	 */
 	public function __construct(
+		array $entityDeserializers,
 		Deserializer $dataValueDeserializer,
-		EntityIdParser $idParser,
-		DispatchableDeserializer $currentEntityDeserializer = null
+		EntityIdParser $idParser
 	) {
 		$this->legacyFactory = new LegacyDeserializerFactory( $dataValueDeserializer, $idParser );
-		$this->currentFactory = new CurrentDeserializerFactory( $dataValueDeserializer, $idParser );
-		$this->currentEntityDeserializer = $currentEntityDeserializer;
+		$this->currentFactory = new CurrentDeserializerFactory(
+			$entityDeserializers,
+			$dataValueDeserializer,
+			$idParser
+		);
 	}
 
 	/**
@@ -63,7 +64,7 @@ class DeserializerFactory {
 	public function newEntityDeserializer() {
 		return new EntityDeserializer(
 			$this->legacyFactory->newEntityDeserializer(),
-			$this->currentEntityDeserializer ?: $this->currentFactory->newEntityDeserializer()
+			$this->currentFactory->newEntityDeserializer()
 		);
 	}
 

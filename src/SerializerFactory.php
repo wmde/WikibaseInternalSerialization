@@ -10,6 +10,7 @@ namespace Wikibase\InternalSerialization;
  * implementation is returned.
  *
  * @since 1.0
+ * @deprecated since 3.0, just use the base class
  *
  * @license GPL-2.0+
  * @author Jeroen De Dauw < jeroendedauw@gmail.com >

@@ -43,6 +43,7 @@ class TestFactoryBuilder {
 
 	public static function newDeserializerFactory( PHPUnit_Framework_TestCase $testCase ) {
 		return new DeserializerFactory(
+			[],
 			self::newFakeDataValueDeserializer( $testCase ),
 			new BasicEntityIdParser()
 		);
@@ -57,6 +58,11 @@ class TestFactoryBuilder {
 
 	public static function newDeserializerFactoryWithDataValueSupport() {
 		return new DeserializerFactory(
+			[
+				'item' => function ( \Wikibase\DataModel\DeserializerFactory $factory ) {
+					return $factory->newItemDeserializer();
+				},
+			],
 			self::newRealDataValueDeserializer(),
 			new BasicEntityIdParser()
 		);
@@ -80,11 +86,23 @@ class TestFactoryBuilder {
 	}
 
 	public static function newSerializerFactory() {
-		return new SerializerFactory( new DataValueSerializer() );
+		return new SerializerFactory(
+			[
+				'item' => function ( SerializerFactory $factory ) {
+					return $factory->newItemSerializer();
+				},
+			],
+			new DataValueSerializer()
+		);
 	}
 
 	public static function newCurrentDeserializerFactory() {
 		return new \Wikibase\DataModel\DeserializerFactory(
+			[
+				'item' => function ( \Wikibase\DataModel\DeserializerFactory $factory ) {
+					return $factory->newItemDeserializer();
+				},
+			],
 			self::newRealDataValueDeserializer(),
 			new BasicEntityIdParser()
 		);

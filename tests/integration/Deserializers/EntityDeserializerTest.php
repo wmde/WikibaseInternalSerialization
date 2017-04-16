@@ -65,8 +65,8 @@ class EntityDeserializerTest extends \PHPUnit_Framework_TestCase {
 	private function newTestItem() {
 		$item = new Item( new ItemId( 'Q42' ) );
 
-		$item->setLabel( 'en', 'foo' );
-		$item->setLabel( 'de', 'bar' );
+		$item->getFingerprint()->setLabel( 'en', 'foo' );
+		$item->getFingerprint()->setLabel( 'de', 'bar' );
 
 		$item->getSiteLinkList()->addNewSiteLink( 'wiki', 'page' );
 

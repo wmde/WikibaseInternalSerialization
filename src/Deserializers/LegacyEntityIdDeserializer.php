@@ -2,7 +2,7 @@
 
 namespace Wikibase\InternalSerialization\Deserializers;
 
-use Deserializers\Deserializer;
+use Deserializers\DispatchableDeserializer;
 use Deserializers\Exceptions\DeserializationException;
 use InvalidArgumentException;
 use Wikibase\DataModel\Entity\EntityId;
@@ -14,7 +14,7 @@ use Wikibase\DataModel\Entity\EntityIdParsingException;
  * @license GPL-2.0+
  * @author Jeroen De Dauw < jeroendedauw@gmail.com >
  */
-class LegacyEntityIdDeserializer implements Deserializer {
+class LegacyEntityIdDeserializer implements DispatchableDeserializer {
 
 	/**
 	 * @var EntityIdParser
@@ -35,7 +35,7 @@ class LegacyEntityIdDeserializer implements Deserializer {
 		if ( is_string( $serialization ) ) {
 			return $this->getParsedId( $serialization );
 		}
-		elseif ( $this->isLegacyFormat( $serialization ) ) {
+		elseif ( $this->isDeserializerFor( $serialization ) ) {
 			return $this->getIdFromLegacyFormat( $serialization );
 		}
 		else {
@@ -43,11 +43,12 @@ class LegacyEntityIdDeserializer implements Deserializer {
 		}
 	}
 
-	private function isLegacyFormat( $serialization ) {
-		return is_array( $serialization ) && count( $serialization ) == 2
-			&& array_key_exists( 0, $serialization ) && array_key_exists( 1, $serialization );
-	}
-
+	/**
+	 * @param string $serialization
+	 *
+	 * @throws DeserializationException
+	 * @return EntityId
+	 */
 	private function getParsedId( $serialization ) {
 		try {
 			return $this->idParser->parse( $serialization );
@@ -64,6 +65,22 @@ class LegacyEntityIdDeserializer implements Deserializer {
 		catch ( InvalidArgumentException $ex ) {
 			throw new DeserializationException( $ex->getMessage(), $ex );
 		}
+	}
+
+	/**
+	 * @see DispatchableDeserializer::isDeserializerFor
+	 *
+	 * @since 2.2
+	 *
+	 * @param mixed $serialization
+	 *
+	 * @return bool
+	 */
+	public function isDeserializerFor( $serialization ) {
+		return is_array( $serialization )
+			&& count( $serialization ) === 2
+			&& array_key_exists( 0, $serialization )
+			&& array_key_exists( 1, $serialization );
 	}
 
 }

@@ -106,7 +106,7 @@ Wikibase Internal Serialization has been written by [Jeroen De Dauw]
 
 ## Release notes
 
-### 2.6.0 (2017-09-15)
+### 2.6.0 (2017-09-18)
 
 * Added compatibility with DataValues Common 0.4, Number 0.9, and Time 0.8
 
